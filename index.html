@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Weekly Planner Pro - Task & Habit Dashboard</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%236366f1'/><path d='M30 25h40M30 40h40M30 55h40M30 70h25' stroke='%23ffffff' stroke-width='8' stroke-linecap='round'/><circle cx='70' cy='70' r='10' fill='%2310b981'/><path d='M66 70l3 3 6-6' stroke='%23ffffff' stroke-width='3' fill='none'/></svg>" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%236366f1'/><path d='M30 25h40M30 40h40M30 55h40M30 70h25' stroke='%23ffffff' stroke-width='8' stroke-linecap='round'/><circle cx='70' cy='70' r='10' fill='%2310b981'/><path d='M66 70l3 3 6-6' stroke='%23ffffff' stroke-width='3' fill='none'/></svg>" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WeeklyPlanner">
+
+    <link rel="stylesheet" href="styles.css">
+    <!-- Standalone Canvas Library for PNG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body class="light-theme">
+    <!-- TOP NAVBAR / TOOLBAR WITH SLEEK ENGLISH ICON BUTTONS -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="logo-badge">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>WEEKLY PLANNER</h1>
+                <span class="sub-title">LỊCH DƯƠNG & LỊCH ÂM</span>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <!-- SEARCH BAR & CATEGORY FILTER -->
+            <div class="search-box-container">
+                <input type="text" id="taskSearchInput" placeholder="🔍 Search tasks..." />
+                <select id="categoryFilterSelect" class="category-filter-select" title="Filter by tag">
+                    <option value="all">All Tags</option>
+                    <option value="work">💼 Work</option>
+                    <option value="study">📚 Study</option>
+                    <option value="health">🏋️ Health</option>
+                    <option value="personal">🏠 Personal</option>
+                    <option value="finance">💰 Finance</option>
+                </select>
+            </div>
+
+            <!-- WEEK SELECTOR -->
+            <div class="week-picker-container">
+                <span class="picker-label">WEEK:</span>
+                <div class="date-picker-group">
+                    <button id="prevWeekBtn" class="icon-btn" title="Previous Week">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <div class="custom-date-display" title="Select Week Start Date">
+                        <span id="displayedWeekDate">03/08/2026</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <input type="date" id="weekStartDate" class="hidden-date-picker" />
+                    </div>
+                    <button id="todayWeekBtn" class="btn btn-sm btn-pill" title="Jump to Today">Today</button>
+                    <button id="nextWeekBtn" class="icon-btn" title="Next Week">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ENGLISH ICON ACTION BUTTONS -->
+            <div class="action-buttons">
+                <button id="exportIcsBtn" class="btn btn-outline btn-pill" title="Sync to Google Calendar (.ics)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    G-Cal
+                </button>
+                <button id="duplicateWeekBtn" class="btn btn-outline btn-pill" title="Duplicate Tasks to Next Week">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Clone
+                </button>
+                <button id="historyBtn" class="btn btn-outline btn-pill" title="Backup History & Restore">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    History
+                </button>
+                <button id="exportPngBtn" class="btn btn-outline btn-pill" title="Export Dashboard to PNG Image">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    PNG
+                </button>
+                <button id="printBtn" class="btn btn-outline btn-pill" title="Print or Save PDF">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    PDF
+                </button>
+                <button id="clearPlannerBtn" class="btn btn-danger btn-pill" title="Reset All Tasks">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Reset
+                </button>
+                <button id="exportBtn" class="btn btn-outline btn-pill" title="Export Backup JSON">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    Export
+                </button>
+                <label id="importLabel" class="btn btn-outline btn-pill" title="Import JSON Backup">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Import
+                    <input type="file" id="importInput" accept=".json" style="display:none;" />
+                </label>
+                <button id="themeToggleBtn" class="icon-btn theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- DASHBOARD MAIN LAYOUT (FULL WIDTH 7 DAYS GRID TOP + STATS & HABITS BOTTOM) -->
+    <div class="planner-layout">
+        
+        <!-- MAIN 7-DAY COLUMNS GRID (FULL WIDTH) -->
+        <main class="planner-grid" id="plannerGrid">
+            <!-- 7 Days (Monday - Sunday) rendered dynamically by JS -->
+        </main>
+
+        <!-- BOTTOM DASHBOARD PANEL: CHARTS & HABIT TRACKER -->
+        <footer class="planner-bottom-panel">
+
+            <!-- CHART 1: WEEKLY BAR CHART & DOUGHNUT RADIAL STATS -->
+            <div class="card bottom-card charts-card">
+                <div class="card-header">
+                    <h3>THỐNG KÊ & BIỂU ĐỒ TUẦN</h3>
+                    <span id="weeklyAvgPercent" class="badge badge-gradient">0%</span>
+                </div>
+                
+                <div class="charts-wrapper">
+                    <!-- DOUGHNUT RADIAL GAUGE -->
+                    <div class="doughnut-chart-box">
+                        <div class="donut-svg-wrapper">
+                            <svg width="56" height="56" viewBox="0 0 60 60">
+                                <circle class="donut-bg" cx="30" cy="30" r="22"></circle>
+                                <circle id="donutCircle" class="donut-fill" cx="30" cy="30" r="22"></circle>
+                            </svg>
+                            <span id="donutPercentText" class="donut-text">0%</span>
+                        </div>
+                        <div class="donut-stats-info">
+                            <div class="stat-line"><span class="dot done-dot"></span> Done: <b id="totalDoneCount">0</b></div>
+                            <div class="stat-line"><span class="dot pending-dot"></span> Pending: <b id="totalPendingCount">0</b></div>
+                        </div>
+                    </div>
+
+                    <!-- BAR CHART -->
+                    <div class="bar-chart-container">
+                        <div class="bar-chart" id="weeklyBarChart">
+                            <!-- Rendered dynamically by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HABIT TRACKER CARD -->
+            <div class="card bottom-card habit-card">
+                <div class="card-header flex-between">
+                    <h3>THEO DÕI THÓI QUEN</h3>
+                    <button id="addHabitBtn" class="icon-btn-sm btn-glow" title="Thêm thói quen mới">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+                <div class="habit-table-wrapper">
+                    <table class="habit-table">
+                        <thead>
+                            <tr>
+                                <th class="habit-name-col">Habits</th>
+                                <th>T2</th>
+                                <th>T3</th>
+                                <th>T4</th>
+                                <th>T5</th>
+                                <th>T6</th>
+                                <th>T7</th>
+                                <th>CN</th>
+                                <th class="streak-col">Streak</th>
+                                <th class="action-col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="habitTableBody">
+                            <!-- Rendered dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </footer>
+    </div>
+
+    <!-- MODAL FOR ADDING HABIT -->
+    <div id="habitModal" class="modal-overlay hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h4>Thêm Thói Quen Mới</h4>
+                <button class="close-modal-btn" id="closeHabitModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="habitTitleInput" placeholder="Ví dụ: Đọc sách 20p, Tập Yoga, Uống 2L nước..." />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelHabitBtn">Hủy</button>
+                <button class="btn btn-accent" id="saveHabitBtn">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FOR HISTORY RESTORE -->
+    <div id="historyModal" class="modal-overlay hidden">
+        <div class="modal-content glass-card history-modal-card">
+            <div class="modal-header">
+                <h4>⏳ Lịch Sử Sao Lưu Dữ Liệu</h4>
+                <button class="close-modal-btn" id="closeHistoryModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="history-intro">Chọn phiên bản lưu cũ để khôi phục trạng thái:</p>
+                <ul id="historySnapshotsList" class="history-list">
+                    <!-- Rendered dynamically by JS -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelHistoryBtn">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

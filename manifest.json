@@ -1,0 +1,16 @@
+{
+  "name": "Weekly Planner Pro",
+  "short_name": "WeeklyPlanner",
+  "description": "Quản lý công việc & thói quen cá nhân offline",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%236366f1'/><path d='M30 25h40M30 40h40M30 55h40M30 70h25' stroke='%23ffffff' stroke-width='8' stroke-linecap='round'/><circle cx='70' cy='70' r='10' fill='%2310b981'/><path d='M66 70l3 3 6-6' stroke='%23ffffff' stroke-width='3' fill='none'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
