@@ -1,16 +1,16 @@
 /* ==========================================================================
    WEEKLY PLANNER PRO - ULTRA WIDESCREEN DASHBOARD LOGIC
-   Full Multi-Week Data Keying (Fix: Task & Habit Isolation Per Week)
+   Full Multi-Week Data Keying & Reliable Local Date Arithmetic (Fix Clone & Prev/Next)
    ========================================================================== */
 
 const DAYS_CONFIG = [
-    { key: 'mon', name: 'Monday', label: 'Thứ Hai', color: '#00b4d8', grad: 'linear-gradient(180deg, #00f2fe, #00b4d8)' },
-    { key: 'tue', name: 'Tuesday', label: 'Thứ Ba', color: '#ff2a6d', grad: 'linear-gradient(180deg, #ff5858, #ff2a6d)' },
-    { key: 'wed', name: 'Wednesday', label: 'Thứ Tư', color: '#10b981', grad: 'linear-gradient(180deg, #34d399, #059669)' },
-    { key: 'thu', name: 'Thursday', label: 'Thứ Năm', color: '#8b5cf6', grad: 'linear-gradient(180deg, #a78bfa, #7c3aed)' },
-    { key: 'fri', name: 'Friday', label: 'Thứ Sáu', color: '#f59e0b', grad: 'linear-gradient(180deg, #fbbf24, #d97706)' },
-    { key: 'sat', name: 'Saturday', label: 'Thứ Bảy', color: '#2563eb', grad: 'linear-gradient(180deg, #60a5fa, #1d4ed8)' },
-    { key: 'sun', name: 'Sunday', label: 'Chủ Nhật', color: '#ef4444', grad: 'linear-gradient(180deg, #f87171, #dc2626)' }
+    { key: 'mon', name: 'Monday', label: 'Thứ Hai', color: '#0284c7', grad: 'linear-gradient(135deg, #38bdf8, #0284c7)' },
+    { key: 'tue', name: 'Tuesday', label: 'Thứ Ba', color: '#e11d48', grad: 'linear-gradient(135deg, #fb7185, #e11d48)' },
+    { key: 'wed', name: 'Wednesday', label: 'Thứ Tư', color: '#059669', grad: 'linear-gradient(135deg, #34d399, #059669)' },
+    { key: 'thu', name: 'Thursday', label: 'Thứ Năm', color: '#7c3aed', grad: 'linear-gradient(135deg, #c084fc, #7c3aed)' },
+    { key: 'fri', name: 'Friday', label: 'Thứ Sáu', color: '#d97706', grad: 'linear-gradient(135deg, #fbbf24, #d97706)' },
+    { key: 'sat', name: 'Saturday', label: 'Thứ Bảy', color: '#2563eb', grad: 'linear-gradient(135deg, #60a5fa, #1d4ed8)' },
+    { key: 'sun', name: 'Sunday', label: 'Chủ Nhật', color: '#dc2626', grad: 'linear-gradient(135deg, #f87171, #dc2626)' }
 ];
 
 const CATEGORIES_CONFIG = {
@@ -107,7 +107,7 @@ function getWeekData(weekDateStr) {
     return appState.weeksData[weekDateStr];
 }
 
-// MULTI-WEEK HABITS HELPER (Fixes habit checks leaking across weeks)
+// MULTI-WEEK HABITS HELPER
 function getHabitChecks(habit, weekDateStr) {
     if (!habit.weeksChecks) {
         habit.weeksChecks = {};
@@ -209,7 +209,6 @@ function loadState() {
             const parsed = JSON.parse(saved);
             const defaultWeekKey = parsed.weekStartDate || formatDateStr(getMondayOfCurrentWeek());
 
-            // MIGRATION 1: Convert single-week `daysData` to multi-week `weeksData`
             if (parsed.daysData && !parsed.weeksData) {
                 parsed.weeksData = {
                     [defaultWeekKey]: parsed.daysData
@@ -217,7 +216,6 @@ function loadState() {
                 delete parsed.daysData;
             }
 
-            // MIGRATION 2: Convert single-week `habit.checks` to multi-week `habit.weeksChecks`
             if (parsed.habits && Array.isArray(parsed.habits)) {
                 parsed.habits.forEach(h => {
                     if (h.checks && !h.weeksChecks) {
@@ -318,7 +316,6 @@ function createHistorySnapshot() {
             data: JSON.parse(JSON.stringify(appState))
         };
 
-        // Keep last 6 snapshots
         historySnapshots = [newSnapshot, ...historySnapshots.slice(0, 5)];
         localStorage.setItem(HISTORY_KEY, JSON.stringify(historySnapshots));
     } catch (e) {
@@ -567,7 +564,8 @@ function renderPlannerGrid() {
         const dayCard = document.createElement('div');
         dayCard.className = `day-column ${isToday ? 'today-column' : ''}`;
         dayCard.dataset.dayKey = day.key;
-        dayCard.style.borderTop = `3px solid ${day.color}`;
+        dayCard.style.setProperty('--day-color', day.color);
+        dayCard.style.setProperty('--day-grad', day.grad);
 
         dayCard.innerHTML = `
             ${isToday ? '<span class="today-badge">HÔM NAY</span>' : ''}
@@ -836,7 +834,6 @@ function startTaskReminderChecker() {
     }, 20000);
 }
 
-// DUPLICATE/CLONE CURRENT WEEK TO NEXT WEEK (ROBUST IMPLEMENTATION)
 function duplicateCurrentWeekToNext() {
     const currentWeekKey = appState.weekStartDate;
     const nextMondayStr = addDaysToDateStr(currentWeekKey, 7);

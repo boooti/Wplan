@@ -302,7 +302,7 @@ body.dark-theme .moon-icon { display: block; }
     overflow: hidden;
 }
 
-/* LIQUID GLASS DAY COLUMN CARDS */
+/* LIQUID GLASS DAY COLUMN CARDS WITH EXPANDING NEON TOP HEADER BAR */
 .day-column {
     background: var(--card-bg);
     backdrop-filter: blur(24px) saturate(180%);
@@ -312,17 +312,40 @@ body.dark-theme .moon-icon { display: block; }
     box-shadow: var(--shadow-sm), inset 0 1px 1px rgba(255, 255, 255, 0.5);
     display: flex;
     flex-direction: column;
-    padding: 9px;
+    padding: 14px 9px 9px 9px;
     gap: 7px;
     height: 100%;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     position: relative;
 }
+
+/* THICKER & VIBRANT TOP ACCENT GLOW BAR */
+.day-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--day-grad, var(--primary-gradient));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transition: height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, filter 0.3s ease;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+/* ON HOVER: TOP ACCENT BAR EXPANDS TO 12PX AND EMITS RADIANT NEON GLOW */
 .day-column:hover {
     box-shadow: var(--shadow-hover);
-    border-color: rgba(99, 102, 241, 0.5);
-    transform: translateY(-3px);
+    border-color: var(--day-color, rgba(99, 102, 241, 0.5));
+    transform: translateY(-4px) scale(1.01);
+}
+
+.day-column:hover::before {
+    height: 12px;
+    filter: brightness(1.2) drop-shadow(0 4px 12px var(--day-color, #6366f1));
+    box-shadow: 0 4px 20px var(--day-color, rgba(99, 102, 241, 0.6));
 }
 
 /* ULTRA HIGH-VISIBILITY GLOWING TODAY COLUMN */
@@ -341,8 +364,8 @@ body.dark-theme .day-column.today-column {
 
 .today-badge {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 9px;
+    right: 7px;
     background: linear-gradient(135deg, #6366f1, #ec4899);
     color: #ffffff;
     font-size: 0.62rem;
@@ -352,6 +375,7 @@ body.dark-theme .day-column.today-column {
     border-radius: 12px;
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.55);
     animation: pulseGlow 1.8s infinite ease-in-out;
+    z-index: 4;
 }
 
 @keyframes pulseGlow {
